@@ -4,15 +4,16 @@ import jm.task.core.jdbc.service.UserServiceImpl;
 
 public class Main {
     public static void main(String[] args) {
-        UserServiceImpl daoJDBC = new UserServiceImpl();
+        UserServiceImpl userService = new UserServiceImpl();
 
-        daoJDBC.createUsersTable();
-        daoJDBC.saveUser("Ivan", "Ivanov", (byte) 22);
-        daoJDBC.saveUser("Petr", "Petrov", (byte) 22);
-        daoJDBC.saveUser("Smir", "Smirnov", (byte) 22);
-        daoJDBC.saveUser("Another", "Monkey", (byte) 22);
-        daoJDBC.getAllUsers().forEach(System.out::println);
-        daoJDBC.cleanUsersTable();
-        daoJDBC.dropUsersTable();
+        userService.createUsersTable();
+        userService.saveUser("Ivan", "Ivanov", (byte) 22);
+        userService.saveUser("Petr", "Petrov", (byte) 22);
+        userService.saveUser("Smir", "Smirnov", (byte) 22);
+        userService.saveUser("Another", "Monkey", (byte) 22);
+        userService.removeUserById(4);
+        userService.getAllUsers().forEach(System.out::println);
+        userService.cleanUsersTable();
+        userService.dropUsersTable();
     }
 }
