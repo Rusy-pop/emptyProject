@@ -4,10 +4,24 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
-
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 public class Util {
+
+    private static Connection connection;
+
+    public static Connection getConnection() {
+        try {
+            connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/mydb", "rusy", "Some123Password");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return connection;
+    }
 
     public static SessionFactory getSessionFactory() {
         HashMap<String, String> settings = new HashMap<>();
@@ -24,5 +38,5 @@ public class Util {
         MetadataSources metadataSources = new MetadataSources(serviceRegistry).
                 addAnnotatedClass(jm.task.core.jdbc.model.User.class);
         return metadataSources.buildMetadata().buildSessionFactory();
-    }
+    } // реализуйте настройку соеденения с БД
 }
