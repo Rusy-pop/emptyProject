@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 public class Util {
-
     private static Connection connection;
 
     public static Connection getConnection() {
