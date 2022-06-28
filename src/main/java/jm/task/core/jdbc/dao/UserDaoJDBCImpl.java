@@ -8,42 +8,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
+    private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS user (" +
+            " `id` BIGINT NOT NULL AUTO_INCREMENT," +
+            " `name` VARCHAR(15) NULL," +
+            " `lastName` VARCHAR(15) NULL," +
+            " `age` TINYINT NULL," +
+            " PRIMARY KEY (`id`)," +
+            " UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);";
+    private static final String DROP_TABLE = "DROP TABLE IF EXISTS user;";
+    private static final String SAVE_USER = "INSERT INTO user(name, lastname, age)" +
+            "VALUES (?, ?, ?);";
+    private static final String REMOVE_BY_ID = "DELETE FROM user WHERE id = ?;";
+
+    private static final String GET_ALL_USERS = "SELECT * FROM user;";
+    private static final String CLEAN_TABLE = "TRUNCATE user;";
+
     public UserDaoJDBCImpl() {
 
     }
 
     public void createUsersTable() {
-        String query = "CREATE TABLE IF NOT EXISTS user (" +
-                " `id` BIGINT NOT NULL AUTO_INCREMENT," +
-                " `name` VARCHAR(15) NULL," +
-                " `lastName` VARCHAR(15) NULL," +
-                " `age` TINYINT NULL," +
-                " PRIMARY KEY (`id`)," +
-                " UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);";
-
         try (Connection connection = Util.getConnection();
              Statement statement = connection.createStatement()) {
-            statement.executeUpdate(query);
+            statement.executeUpdate(CREATE_TABLE);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void dropUsersTable() {
-        String query = "DROP TABLE IF EXISTS user;";
         try (Connection connection = Util.getConnection();
              Statement statement = connection.createStatement()) {
-            statement.executeUpdate(query);
+            statement.executeUpdate(DROP_TABLE);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        String query = "INSERT INTO user(name, lastname, age)" +
-                "VALUES (?, ?, ?);";
         try (Connection connection = Util.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(SAVE_USER)) {
             statement.setString(1, name);
             statement.setString(2, lastName);
             statement.setByte(3, age);
@@ -54,10 +58,8 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-        String query = "DELETE FROM user WHERE id = ?;";
-
         try (Connection connection = Util.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(REMOVE_BY_ID)) {
             statement.setLong(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -67,10 +69,10 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public List<User> getAllUsers() {
         ArrayList<User> userList = new ArrayList<>();
-        String query = "SELECT * FROM user;";
+
         try (Connection connection = Util.getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
+             ResultSet resultSet = statement.executeQuery(GET_ALL_USERS)) {
 
             while (resultSet.next()) {
                 long id = resultSet.getLong("id");
@@ -88,10 +90,9 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        String query = "TRUNCATE user;";
         try (Connection connection = Util.getConnection();
              Statement statement = connection.createStatement()) {
-            statement.executeUpdate(query);
+            statement.executeUpdate(CLEAN_TABLE);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
