@@ -5,13 +5,12 @@ import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
 import javax.persistence.Query;
-import java.sql.SQLException;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
     private static SessionFactory sessionFactory = Util.getSessionFactory();
+    private Transaction transaction;
 
     public UserDaoHibernateImpl() {
     }
@@ -19,9 +18,8 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        try (Session session = sessionFactory.getCurrentSession()){
-            Transaction transaction = session.beginTransaction();
-
+        try (Session session = sessionFactory.getCurrentSession()) {
+            transaction = session.beginTransaction();
             Query query = session.createSQLQuery(
                             "CREATE TABLE IF NOT EXISTS user (" +
                                     " `id` BIGINT NOT NULL AUTO_INCREMENT," +
@@ -32,21 +30,24 @@ public class UserDaoHibernateImpl implements UserDao {
                                     " UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);")
                     .addEntity(User.class);
             query.executeUpdate();
-            transaction.commit();
         } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.getMessage();
         }
     }
 
     @Override
     public void dropUsersTable() {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction transaction = session.beginTransaction();
-
-        Query query = session.createSQLQuery("DROP TABLE IF EXISTS user");
-        query.executeUpdate();
-        transaction.commit();
-        session.close();
+        try(Session session = sessionFactory.getCurrentSession()){
+            Transaction transaction = session.beginTransaction();
+            Query query = session.createNativeQuery("DROP TABLE IF EXISTS user").addEntity(User.class);
+            query.executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
