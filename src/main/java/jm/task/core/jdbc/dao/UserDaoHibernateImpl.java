@@ -15,7 +15,6 @@ public class UserDaoHibernateImpl implements UserDao {
     public UserDaoHibernateImpl() {
     }
 
-
     @Override
     public void createUsersTable() {
         try (Session session = sessionFactory.getCurrentSession()) {
@@ -31,9 +30,6 @@ public class UserDaoHibernateImpl implements UserDao {
                     .addEntity(User.class);
             query.executeUpdate();
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
             e.getMessage();
         }
     }

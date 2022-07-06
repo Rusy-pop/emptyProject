@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 public class Util {
+    private static SessionFactory sessionFactory;
     private static Connection connection;
 
     public static Connection getConnection() {
@@ -36,6 +37,9 @@ public class Util {
                 .applySettings(settings).build();
         MetadataSources metadataSources = new MetadataSources(serviceRegistry).
                 addAnnotatedClass(jm.task.core.jdbc.model.User.class);
-        return metadataSources.buildMetadata().buildSessionFactory();
+        if (sessionFactory == null) {
+            sessionFactory = metadataSources.buildMetadata().buildSessionFactory();
+        }
+        return sessionFactory;
     } // реализуйте настройку соеденения с БД
 }
